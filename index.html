@@ -7,6 +7,202 @@
     <link rel="stylesheet" href="assets/style.css">
     <script type="text/javascript" src="//use.typekit.net/tor0zlh.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <style>
+        #aiPanel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 100vh;
+            background: #fff;
+            color: #222;
+            font-family: 'Courier New', Courier, monospace;
+            z-index: 9999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        #aiPanel.open { transform: translateX(0); }
+        #aiHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #3578b5;
+            border-bottom: 2px solid #428BCA;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+        #aiHeader button {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+            padding: 0 4px;
+        }
+        #aiHeader button:hover { color: #fff; }
+        #aiKeySection {
+            padding: 10px 16px;
+            background: #f5f7fa;
+            border-bottom: 1px solid #dde3ea;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #aiKeyInput {
+            flex: 1;
+            background: #fff;
+            border: 1px solid #ccc;
+            color: #333;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-family: monospace;
+            border-radius: 3px;
+            min-width: 0;
+        }
+        #aiKeyInput:focus { outline: none; border-color: #428BCA; }
+        #aiKeySaveBtn {
+            background: #428BCA;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        #aiKeySaveBtn:hover { background: #3578b5; }
+        #aiKeyStatus { color: #2e8a4f; font-size: 11px; white-space: nowrap; }
+        #aiBody {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #fff;
+        }
+        #aiChat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #fff;
+        }
+        #aiChat::-webkit-scrollbar { width: 5px; }
+        #aiChat::-webkit-scrollbar-track { background: #f0f0f0; }
+        #aiChat::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .msg-user {
+            background: #dceefb;
+            color: #1a3a5c;
+            padding: 8px 10px;
+            border-radius: 8px 8px 2px 8px;
+            align-self: flex-end;
+            max-width: 92%;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .msg-ai {
+            background: #f2f4f7;
+            color: #222;
+            padding: 8px 10px;
+            border-radius: 8px 8px 8px 2px;
+            align-self: flex-start;
+            max-width: 100%;
+            font-size: 13px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .ai-text { white-space: pre-wrap; margin: 2px 0; }
+        .code-block {
+            position: relative;
+            background: #f5f7fa;
+            border: 1px solid #dde3ea;
+            border-radius: 5px;
+            margin: 6px 0;
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 10px 12px;
+            padding-top: 28px;
+            overflow-x: auto;
+            font-size: 12px;
+            color: #1a1a1a;
+            white-space: pre;
+            font-family: monospace;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 6px;
+            background: #e4e8ee;
+            border: 1px solid #ccc;
+            color: #555;
+            padding: 2px 8px;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-family: sans-serif;
+        }
+        .copy-btn:hover { background: #d0d5dd; color: #222; }
+        .copy-btn.copied { color: #2e8a4f; border-color: #2e8a4f; }
+        .msg-thinking { color: #888; font-style: italic; font-size: 12px; align-self: flex-start; }
+        .msg-error { color: #c0392b; font-size: 12px; align-self: flex-start; }
+        #aiInputArea {
+            border-top: 1px solid #dde3ea;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f5f7fa;
+        }
+        #aiInput {
+            background: #fff;
+            border: 1px solid #ccc;
+            color: #222;
+            padding: 7px 9px;
+            font-size: 13px;
+            font-family: monospace;
+            border-radius: 4px;
+            resize: none;
+            height: 64px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        #aiInput:focus { outline: none; border-color: #428BCA; }
+        #aiInputButtons { display: flex; gap: 6px; }
+        #aiSendBtn {
+            background: #428BCA;
+            border: none;
+            color: #fff;
+            padding: 6px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-family: monospace;
+            flex: 1;
+        }
+        #aiSendBtn:hover { background: #3578b5; }
+        #aiSendBtn:disabled { background: #ccc; color: #999; cursor: not-allowed; }
+        #aiNewBtn {
+            background: #e4e8ee;
+            border: 1px solid #ccc;
+            color: #555;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        #aiNewBtn:hover { background: #d0d5dd; color: #222; }
+    </style>
 </head>
 <body ng-controller="Ctrl">
     <a href="https://github.com/Schweigi/assembler-simulator"><img style="z-index:1001;position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
@@ -19,6 +215,7 @@
                     <button type="button" class="btn btn-default navbar-btn" ng-click="executeStep()" ng-disabled="isRunning"><span class="glyphicon glyphicon-forward"></span> Step</button>
                 </div>
                 <button type="button" class="btn btn-default navbar-btn" ng-click="reset()">Reset</button>
+                <button type="button" class="btn btn-info navbar-btn" onclick="toggleAIPanel()" id="aiToggleBtn" style="margin-left:8px;">&#129302; AI Assistant</button>
             </div>
             <div class="navbar-header navbar-right">
                 <a class="navbar-brand" style="color:#FFFFFF">Simple 8-bit Assembler Simulator</a>
@@ -165,5 +362,211 @@
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>
     <script src="assets/asmsimulator.js"></script>
+
+    <!-- AI Assistant Panel -->
+    <div id="aiPanel">
+        <div id="aiHeader">
+            <span>&#129302; AI Assistant</span>
+            <button onclick="toggleAIPanel()" title="Cerrar (ESC)">&#10005;</button>
+        </div>
+        <div id="aiKeySection">
+            <input id="aiKeyInput" type="password" placeholder="Groq API Key..." autocomplete="off" />
+            <button id="aiKeySaveBtn" onclick="saveGroqKey()">Guardar</button>
+            <span id="aiKeyStatus"></span>
+        </div>
+        <div id="aiBody">
+            <div id="aiChat"></div>
+            <div id="aiInputArea">
+                <textarea id="aiInput" placeholder="Escribe la pregunta... (Enter = enviar, Shift+Enter = nueva línea)"></textarea>
+                <div id="aiInputButtons">
+                    <button id="aiSendBtn" onclick="sendMessage()">Enviar &#8594;</button>
+                    <button id="aiNewBtn" onclick="newChat()">Nueva conv.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        var GROQ_MODEL = 'llama-3.3-70b-versatile';
+        var SYSTEM_PROMPT = 'Eres experto en el simulador 8-bit de Schweighauser (curso SI725). Das código que funciona exactamente en este simulador.\n\nREGISTROS: Solo A, B, C, D (8 bits, 0-255). No hay E, F ni otros.\n\nINSTRUCCIONES (solo estas):\nMOV, ADD, SUB, MUL, DIV, INC, DEC, AND, OR, XOR, NOT, SHL, SHR\nCMP, JMP, JZ, JNZ, JC, JNC, JA, JBE, CALL, RET, PUSH, POP, HLT, DB\nLos saltos son JZ/JNZ (no JE/JNE). No existen JGE, JLE, JL, JG, JAE, JB.\n\nSINTAXIS CRÍTICA:\n- CMP siempre: CMP reg, algo (nunca CMP [reg], valor)\n- INC/DEC solo sobre registros (nunca sobre memoria)\n- DB "texto" + DB 0. Las comillas simples NO funcionan — usar comillas dobles o decimal.\n- MOV A, label → dirección en RAM. MOV A, [label] → valor almacenado. Para leer variables usar [label].\n- MOV A, 0 para inicializar (nunca MOV A, nombreVar)\n- AND/OR/XOR sobreescriben el destino: AND C,1 → C queda 0 o 1, no el original\n- Sin comentarios en el código\n\nPATRONES:\n\nEstructura base:\nJMP start\nvar: DB 0\ntxt: DB "Hola"\n     DB 0\nstart:\n  ...\nHLT\n\nOutput (pantalla = dirección 232):\nMOV D, 232 → MOV [D], A → INC D\n\nIncrementar variable en memoria:\nMOV C, [var] / INC C / MOV [var], C\n\nRecorrer string hacia adelante:\nMOV B, txt\n.loop: MOV A, [B] / CMP A, 0 / JZ .fin / [procesar A] / INC B / JMP .loop\n\nRecorrer string hacia atrás (parar por dirección, no por null):\nMOV B, txt\nMOV C, B\n.buscar: MOV A, [B] / CMP A, 0 / JZ .imprimir / INC B / JMP .buscar\n.imprimir: DEC B\n.loop: MOV A, [B] / MOV [D], A / INC D / CMP B, C / JZ .fin / DEC B / JMP .loop\n.fin:\n\nImprimir número 2 dígitos (estilo del curso, requiere ascii: DB 48):\nMOV B, [num]\nMOV A, B\nDIV 10\nMOV C, A\nMUL 10\nSUB B, A\nADD B, [ascii]\nADD C, [ascii]\nMOV [D], C\nINC D\nMOV [D], B\n\nImprimir número 3 dígitos con PUSH/POP (requiere ascii: DB 48):\nMOV B, [num]\nMOV A, B\nDIV 100\nMOV C, A\nADD A, [ascii]\nMOV [D], A / INC D\nMOV A, C / MUL 10 / MOV C, A\nMOV A, B / DIV 10\nPUSH A\nSUB A, C / ADD A, [ascii] / MOV [D], A / INC D\nPOP A / MUL 10\nSUB B, A / ADD B, [ascii] / MOV [D], B\n\nLoop con número que se imprime cada iteración:\nMOV C, A → [imprimir con A, que se corrompe] → MOV A, C → ADD A, 2 → JMP .loop\n\nAritmética con memoria (válido en este simulador):\nADD A, [n1] / SUB B, [n2] / MUL [n3] / DIV [n4]\n\nOutput alternativo con variable:\noutput: DB 232\nMOV D, [output]\n\nCOMPARAR STRINGS (dos punteros A y B):\n.loop: MOV C, [A] / MOV D, [B] / CMP C, 0 / JZ .iguales / CMP C, D / JNZ .diferentes / INC A / INC B / JMP .loop\n\nFORMATO:\n1. Español siempre\n2. Estrategia en 2-3 líneas\n3. Código completo sin comentarios\n4. Si hay error reportado: identificar el bug y dar código corregido';
+
+        function getKey() {
+            return localStorage.getItem('groq_api_key') || '';
+        }
+
+        function saveKey(key) {
+            key = (key || '').trim();
+            if (key) {
+                localStorage.setItem('groq_api_key', key);
+                var status = document.getElementById('aiKeyStatus');
+                status.textContent = '✓ Guardada';
+                setTimeout(function() { status.textContent = ''; }, 1000);
+            }
+        }
+
+        var chatHistory = [];
+
+        function renderAIText(text) {
+            var frag = document.createDocumentFragment();
+            var parts = text.split(/(```[\w]*\n[\s\S]*?```)/g);
+            parts.forEach(function(part) {
+                var codeMatch = part.match(/^```[\w]*\n([\s\S]*?)```$/);
+                if (codeMatch) {
+                    var codeContent = codeMatch[1].replace(/\n$/, '');
+                    var wrapper = document.createElement('div');
+                    wrapper.className = 'code-block';
+                    var btn = document.createElement('button');
+                    btn.className = 'copy-btn';
+                    btn.textContent = 'Copiar';
+                    btn.onclick = (function(content, b) {
+                        return function() {
+                            navigator.clipboard.writeText(content).then(function() {
+                                b.textContent = '✓ Copiado';
+                                b.classList.add('copied');
+                                setTimeout(function() { b.textContent = 'Copiar'; b.classList.remove('copied'); }, 1500);
+                            }).catch(function() {
+                                var ta = document.createElement('textarea');
+                                ta.value = content;
+                                ta.style.position = 'fixed';
+                                ta.style.opacity = '0';
+                                document.body.appendChild(ta);
+                                ta.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(ta);
+                                b.textContent = '✓ Copiado';
+                                b.classList.add('copied');
+                                setTimeout(function() { b.textContent = 'Copiar'; b.classList.remove('copied'); }, 1500);
+                            });
+                        };
+                    })(codeContent, btn);
+                    var pre = document.createElement('pre');
+                    pre.textContent = codeContent;
+                    wrapper.appendChild(btn);
+                    wrapper.appendChild(pre);
+                    frag.appendChild(wrapper);
+                } else if (part) {
+                    var div = document.createElement('div');
+                    div.className = 'ai-text';
+                    div.textContent = part;
+                    frag.appendChild(div);
+                }
+            });
+            return frag;
+        }
+
+        function appendMessage(role, text) {
+            var chat = document.getElementById('aiChat');
+            var div = document.createElement('div');
+            div.className = role === 'user' ? 'msg-user' : (role === 'thinking' ? 'msg-thinking' : role === 'error' ? 'msg-error' : 'msg-ai');
+            if (role === 'ai') {
+                div.appendChild(renderAIText(text));
+            } else {
+                div.textContent = text;
+            }
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+            return div;
+        }
+
+        function newChat() {
+            chatHistory = [];
+            document.getElementById('aiChat').innerHTML = '';
+            document.getElementById('aiInput').focus();
+        }
+
+        function toggleAIPanel() {
+            var panel = document.getElementById('aiPanel');
+            panel.classList.toggle('open');
+            if (panel.classList.contains('open')) {
+                document.getElementById('aiInput').focus();
+            }
+        }
+
+        function closeAIPanel() {
+            document.getElementById('aiPanel').classList.remove('open');
+        }
+
+        async function sendMessage() {
+            var keyInput = document.getElementById('aiKeyInput').value.trim();
+            if (keyInput) saveKey(keyInput);
+            var key = getKey();
+
+            if (!key) {
+                appendMessage('error', '⚠ Ingresa tu Groq API Key y haz clic en Guardar.');
+                return;
+            }
+
+            var input = document.getElementById('aiInput');
+            var text = input.value.trim();
+            if (!text) return;
+
+            input.value = '';
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+
+            var thinking = appendMessage('thinking', '⏳ Pensando...');
+            var btn = document.getElementById('aiSendBtn');
+            btn.disabled = true;
+
+            try {
+                var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + key,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: GROQ_MODEL,
+                        messages: [{ role: 'system', content: SYSTEM_PROMPT }].concat(chatHistory),
+                        temperature: 0.4,
+                        max_tokens: 1500
+                    })
+                });
+
+                thinking.remove();
+
+                if (!res.ok) {
+                    var errData = await res.json().catch(function() { return {}; });
+                    var msg = (errData.error && errData.error.message) ? errData.error.message : res.statusText;
+                    throw new Error('HTTP ' + res.status + ': ' + msg);
+                }
+
+                var data = await res.json();
+                var answer = data.choices[0].message.content;
+                chatHistory.push({ role: 'assistant', content: answer });
+                appendMessage('ai', answer);
+            } catch (err) {
+                thinking.remove();
+                appendMessage('error', '❌ ' + err.message);
+            } finally {
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        document.addEventListener('keydown', function(e) {
+            var panel = document.getElementById('aiPanel');
+            var isOpen = panel.classList.contains('open');
+            if (e.key === 'Escape') { closeAIPanel(); return; }
+            if (e.altKey && e.key === 'a') { e.preventDefault(); toggleAIPanel(); return; }
+            if (isOpen && e.ctrlKey && e.key === 'l') { e.preventDefault(); newChat(); return; }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('aiInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        window.toggleAIPanel = toggleAIPanel;
+        window.sendMessage = sendMessage;
+        window.newChat = newChat;
+        window.saveGroqKey = function() { saveKey(document.getElementById('aiKeyInput').value); };
+    })();
+    </script>
 </body>
 </html>
